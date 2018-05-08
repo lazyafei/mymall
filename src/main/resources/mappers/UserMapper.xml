@@ -35,7 +35,7 @@
       update_time)
     values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{question,jdbcType=VARCHAR}, 
-      #{answer,jdbcType=VARCHAR}, #{role,jdbcType=INTEGER}, now()},
+      #{answer,jdbcType=VARCHAR}, #{role,jdbcType=INTEGER}, now(),
       now())
   </insert>
   <insert id="insertSelective" parameterType="com.mymall.pojo.User" >
@@ -151,4 +151,57 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <select id="checkUsername" resultType="int" parameterType="string">
+    select count(1) from mymall_user
+    where username = #{username}
+  </select>
+
+  <select id="checkEmail" resultType="int" parameterType="string">
+    select count(1) from mymall_user
+    where email = #{email}
+  </select>
+  
+  <select id="selectLogin" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM mymall_user
+    WHERE username = #{username}
+    and password = #{password}
+  </select>
+
+  <select id="selectQuestionByUsername" resultType="string" parameterType="string">
+    SELECT
+    question
+    from mymall_user
+    WHERE username = #{username}
+  </select>
+
+  <select id="checkAnswer" resultType="int" parameterType="map">
+      SELECT
+      count(1)
+      from mymall_user
+      where username = #{username}
+      and answer = #{answer}
+  </select>
+
+  <update id="updatePasswordByUsername" parameterType="map">
+      update mymall_user
+      set password = #{passwordNew},update_time =now()
+      where username = #{username}
+  </update>
+
+  <select id="checkPassword" resultType="int" parameterType="map">
+      SELECT
+      count(1)
+      from mymall_user
+      where id = #{userId}
+      and password = #{password}
+  </select>
+
+  <select id="checkEmailByUserId" resultType="int" parameterType="map">        /*校验email时，看数据库里有没有email并且该email所属的user不是当前登录用户的user，如果有结果 count>0，则该email是其他人已经占用的*/
+    select count(1) from mymall_user
+    where email = #{email}
+    and id != #{userId}
+  </select>
 </mapper>
